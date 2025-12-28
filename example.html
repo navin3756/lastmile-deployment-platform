@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LastMile SDK - Example Integration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section h2 {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    textarea {
+      min-height: 150px;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #6c757d;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+
+    .log-entry {
+      padding: 5px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-entry .timestamp {
+      color: #6c757d;
+      margin-right: 10px;
+    }
+
+    .log-entry.info { color: #0c5460; }
+    .log-entry.success { color: #155724; }
+    .log-entry.error { color: #721c24; }
+
+    .deployment-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .deployment-info.show {
+      display: block;
+    }
+
+    .deployment-info h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .deployment-info p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .deployment-info a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .deployment-info a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 LastMile Deployment Platform</h1>
+      <p>Deploy AI-generated code to production with expert assistance</p>
+    </div>
+
+    <div class="content">
+      <!-- Configuration Section -->
+      <div class="section">
+        <h2>⚙️ Configuration</h2>
+        <div class="form-group">
+          <label for="apiKey">API Key</label>
+          <input type="text" id="apiKey" placeholder="Enter your LastMile API key" value="demo_api_key_12345">
+        </div>
+        <div class="form-group">
+          <label for="apiUrl">API URL (Optional)</label>
+          <input type="text" id="apiUrl" placeholder="https://api.lastmile.dev" value="https://api.lastmile.dev">
+        </div>
+        <div class="button-group">
+          <button onclick="initializeSDK()">Initialize SDK</button>
+          <button onclick="validateConfig()" class="secondary">Validate Config</button>
+        </div>
+        <div id="configStatus" class="status"></div>
+      </div>
+
+      <!-- Deployment Section -->
+      <div class="section">
+        <h2>📦 Deploy Code</h2>
+        <div class="form-group">
+          <label for="projectName">Project Name</label>
+          <input type="text" id="projectName" placeholder="my-awesome-app" value="demo-react-app">
+        </div>
+        <div class="form-group">
+          <label for="framework">Framework</label>
+          <select id="framework">
+            <option value="auto-detect">Auto Detect</option>
+            <option value="react">React</option>
+            <option value="vue">Vue.js</option>
+            <option value="angular">Angular</option>
+            <option value="node">Node.js</option>
+            <option value="express">Express</option>
+            <option value="next">Next.js</option>
+            <option value="static">Static HTML</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="code">Code to Deploy</label>
+          <textarea id="code" placeholder="Paste your code here...">// Sample React Component
+import React from 'react';
+
+function App() {
+  return (
+    <div className="app">
+      <h1>Hello from LastMile!</h1>
+      <p>This is a demo deployment.</p>
+    </div>
+  );
+}
+
+export default App;</textarea>
+        </div>
+        <div class="form-group">
+          <label for="envVars">Environment Variables (JSON, Optional)</label>
+          <textarea id="envVars" placeholder='{"NODE_ENV": "production", "API_URL": "https://api.example.com"}' style="min-height: 80px;">{}</textarea>
+        </div>
+        <div class="button-group">
+          <button onclick="deployCode()">🚀 Deploy</button>
+          <button onclick="clearForm()" class="secondary">Clear</button>
+        </div>
+        <div id="deployStatus" class="status"></div>
+        <div id="deploymentInfo" class="deployment-info"></div>
+      </div>
+
+      <!-- Status Checking Section -->
+      <div class="section">
+        <h2>📊 Check Deployment Status</h2>
+        <div class="form-group">
+          <label for="deploymentId">Deployment ID</label>
+          <input type="text" id="deploymentId" placeholder="Enter deployment ID">
+        </div>
+        <div class="button-group">
+          <button onclick="checkStatus()">Check Status</button>
+          <button onclick="pollStatus()" class="secondary">Poll Status</button>
+        </div>
+        <div id="statusResult" class="status"></div>
+      </div>
+
+      <!-- Deployment List Section -->
+      <div class="section">
+        <h2>📋 Recent Deployments</h2>
+        <div class="button-group">
+          <button onclick="listDeployments()">List Deployments</button>
+        </div>
+        <div id="deploymentList" class="status"></div>
+      </div>
+
+      <!-- Event Log Section -->
+      <div class="section">
+        <h2>📝 Event Log</h2>
+        <div id="eventLog" class="log">
+          <div class="log-entry info">
+            <span class="timestamp">[Ready]</span>
+            <span>Waiting for SDK initialization...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include LastMile SDK -->
+  <script src="lastmile.js"></script>
+
+  <script>
+    // Global SDK instance
+    let lastMile = null;
+
+    // Log helper function
+    function log(message, type = 'info') {
+      const logDiv = document.getElementById('eventLog');
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.innerHTML = `<span class="timestamp">[${timestamp}]</span><span>${message}</span>`;
+      logDiv.appendChild(entry);
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    // Show status message
+    function showStatus(elementId, message, type) {
+      const statusDiv = document.getElementById(elementId);
+      statusDiv.className = `status ${type} show`;
+      statusDiv.textContent = message;
+      setTimeout(() => {
+        statusDiv.classList.remove('show');
+      }, 5000);
+    }
+
+    // Initialize SDK
+    function initializeSDK() {
+      const apiKey = document.getElementById('apiKey').value;
+      const apiUrl = document.getElementById('apiUrl').value;
+
+      if (!apiKey) {
+        showStatus('configStatus', 'Please enter an API key', 'error');
+        return;
+      }
+
+      try {
+        lastMile = new LastMile({
+          apiKey: apiKey,
+          apiUrl: apiUrl || undefined,
+          debug: true
+        });
+
+        // Set up event listeners
+        lastMile.on('deployStart', (data) => {
+          log(`🚀 Deployment started for: ${data.projectName}`, 'info');
+        });
+
+        lastMile.on('deploySuccess', (data) => {
+          log(`✅ Deployment successful! ID: ${data.deploymentId}`, 'success');
+        });
+
+        lastMile.on('deployError', (data) => {
+          log(`❌ Deployment failed: ${data.error}`, 'error');
+        });
+
+        lastMile.on('statusUpdate', (data) => {
+          log(`📊 Status update: ${data.status}`, 'info');
+        });
+
+        log('✅ LastMile SDK initialized successfully', 'success');
+        showStatus('configStatus', 'SDK initialized successfully!', 'success');
+      } catch (error) {
+        log(`❌ Initialization failed: ${error.message}`, 'error');
+        showStatus('configStatus', error.message, 'error');
+      }
+    }
+
+    // Validate configuration
+    async function validateConfig() {
+      if (!lastMile) {
+        showStatus('configStatus', 'Please initialize SDK first', 'error');
+        return;
+      }
+
+      try {
+        log('🔍 Validating configuration...', 'info');
+        const result = await lastMile.validateConfig();
+        log('✅ Configuration is valid', 'success');
+        showStatus('configStatus', 'Configuration is valid!', 'success');
+      } catch (error) {
+        log(`❌ Validation failed: ${error.message}`, 'error');
+        showStatus('configStatus', error.message, 'error');
+      }
+    }
+
+    // Deploy code
+    async function deployCode() {
+      if (!lastMile) {
+        showStatus('deployStatus', 'Please initialize SDK first', 'error');
+        return;
+      }
+
+      const projectName = document.getElementById('projectName').value;
+      const framework = document.getElementById('framework').value;
+      const code = document.getElementById('code').value;
+      const envVarsText = document.getElementById('envVars').value;
+
+      if (!projectName || !code) {
+        showStatus('deployStatus', 'Please fill in all required fields', 'error');
+        return;
+      }
+
+      let environment = {};
+      try {
+        if (envVarsText.trim()) {
+          environment = JSON.parse(envVarsText);
+        }
+      } catch (error) {
+        showStatus('deployStatus', 'Invalid JSON in environment variables', 'error');
+        return;
+      }
+
+      try {
+        log(`🚀 Starting deployment for ${projectName}...`, 'info');
+        showStatus('deployStatus', 'Deploying...', 'info');
+
+        const result = await lastMile.deploy({
+          projectName: projectName,
+          framework: framework,
+          code: code,
+          environment: environment
+        });
+
+        // Update deployment ID field
+        document.getElementById('deploymentId').value = result.deploymentId;
+
+        // Show deployment info
+        const infoDiv = document.getElementById('deploymentInfo');
+        infoDiv.className = 'deployment-info show';
+        infoDiv.innerHTML = `
+          <h3>Deployment Successful! 🎉</h3>
+          <p><strong>Deployment ID:</strong> <code>${result.deploymentId}</code></p>
+          <p><strong>Status:</strong> ${result.status}</p>
+          <p><strong>URL:</strong> <a href="${result.url}" target="_blank">${result.url}</a></p>
+          <p><strong>Created:</strong> ${new Date(result.createdAt).toLocaleString()}</p>
+        `;
+
+        showStatus('deployStatus', 'Deployment successful!', 'success');
+      } catch (error) {
+        log(`❌ Deployment failed: ${error.message}`, 'error');
+        showStatus('deployStatus', error.message, 'error');
+      }
+    }
+
+    // Check deployment status
+    async function checkStatus() {
+      if (!lastMile) {
+        showStatus('statusResult', 'Please initialize SDK first', 'error');
+        return;
+      }
+
+      const deploymentId = document.getElementById('deploymentId').value;
+      if (!deploymentId) {
+        showStatus('statusResult', 'Please enter a deployment ID', 'error');
+        return;
+      }
+
+      try {
+        log(`🔍 Checking status for ${deploymentId}...`, 'info');
+        const result = await lastMile.getStatus(deploymentId);
+        
+        showStatus('statusResult', `Status: ${result.status}`, 'success');
+        log(`📊 Status: ${result.status}`, 'info');
+      } catch (error) {
+        log(`❌ Status check failed: ${error.message}`, 'error');
+        showStatus('statusResult', error.message, 'error');
+      }
+    }
+
+    // Poll deployment status
+    async function pollStatus() {
+      if (!lastMile) {
+        showStatus('statusResult', 'Please initialize SDK first', 'error');
+        return;
+      }
+
+      const deploymentId = document.getElementById('deploymentId').value;
+      if (!deploymentId) {
+        showStatus('statusResult', 'Please enter a deployment ID', 'error');
+        return;
+      }
+
+      try {
+        log(`🔄 Polling status for ${deploymentId}...`, 'info');
+        showStatus('statusResult', 'Polling status...', 'info');
+        
+        const result = await lastMile.pollStatus(deploymentId);
+        
+        showStatus('statusResult', `Final status: ${result.status}`, 'success');
+        log(`✅ Polling complete. Final status: ${result.status}`, 'success');
+      } catch (error) {
+        log(`❌ Polling failed: ${error.message}`, 'error');
+        showStatus('statusResult', error.message, 'error');
+      }
+    }
+
+    // List deployments
+    async function listDeployments() {
+      if (!lastMile) {
+        showStatus('deploymentList', 'Please initialize SDK first', 'error');
+        return;
+      }
+
+      try {
+        log('📋 Fetching deployment list...', 'info');
+        const result = await lastMile.listDeployments({ limit: 10 });
+        
+        const listDiv = document.getElementById('deploymentList');
+        listDiv.className = 'status success show';
+        
+        if (result.deployments && result.deployments.length > 0) {
+          let html = '<h3>Recent Deployments:</h3>';
+          result.deployments.forEach(dep => {
+            html += `
+              <p><strong>${dep.projectName}</strong> - ${dep.status} 
+              <code>${dep.deploymentId}</code></p>
+            `;
+          });
+          listDiv.innerHTML = html;
+        } else {
+          listDiv.textContent = 'No deployments found';
+        }
+        
+        log(`✅ Found ${result.deployments.length} deployments`, 'success');
+      } catch (error) {
+        log(`❌ Failed to list deployments: ${error.message}`, 'error');
+        showStatus('deploymentList', error.message, 'error');
+      }
+    }
+
+    // Clear form
+    function clearForm() {
+      document.getElementById('projectName').value = '';
+      document.getElementById('code').value = '';
+      document.getElementById('envVars').value = '{}';
+      document.getElementById('framework').value = 'auto-detect';
+      log('🧹 Form cleared', 'info');
+    }
+
+    // Auto-initialize on page load
+    window.addEventListener('load', () => {
+      log('👋 Welcome to LastMile SDK Demo!', 'info');
+      log('Click "Initialize SDK" to get started', 'info');
+    });
+  </script>
+</body>
+</html>
